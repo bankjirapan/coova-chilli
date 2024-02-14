@@ -13,7 +13,6 @@ Provides: chillispot
 Depends:
  ${shlibs:Depends},
  iptables,
- haserl,
  adduser,
 Suggests:
  python,
