@@ -11,7 +11,7 @@ chilliinclude_HEADERS = \
 chilli.h session.h garden.h radius.h options.h \
 tun.h ippool.h md5.h redir.h dhcp.h iphash.h \
 radius_wispr.h radius_coovachilli.h ssl.h dns.h net.h \
-pkt.h conn.h lookup.h chilli_limits.h cmdline.h debug.h \
+pkt.h conn.h lookup.h log.h chilli_limits.h cmdline.h debug.h \
 radius_pkt.h ../bstring/bstrlib.h ../config.h system.h 
 
 lib_LTLIBRARIES = libchilli.la
@@ -22,7 +22,7 @@ suid_programs =
 
 libchilli_la_SOURCES = \
 chilli.c tun.c ippool.c radius.c md5.c redir.c dhcp.c \
-iphash.c lookup.c system.h util.c options.c statusfile.c conn.c sig.c \
+iphash.c lookup.c log.c system.h util.c options.c statusfile.c conn.c sig.c \
 garden.c dns.c session.c pkt.c chksum.c net.c safe.c
 
 AM_CFLAGS = -D_GNU_SOURCE -Wall -fno-builtin -fno-strict-aliasing \
