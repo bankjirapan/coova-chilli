@@ -20,7 +20,7 @@ char* get_timestamp() {
     return buffer;
 }
 
-void write_dhcp_log(const char *message) {
+void write_dhcp_log(const char *message,...) {
 
     struct stat st = {0};
     FILE *log_file;
@@ -28,20 +28,26 @@ void write_dhcp_log(const char *message) {
     if (stat(DHCP_LOG_FILE_PATH, &st) == -1) {
         mkdir(DHCP_LOG_FILE_PATH, 0700);
     }
-
     log_file = fopen(DHCP_LOG_FILE_PATH "chilli.log", "a");
     if (log_file == NULL) {
         perror("Error opening log file");
         return;
     }
-
     char *timestamp = get_timestamp();
     if (timestamp == NULL) {
         fclose(log_file);
         return;
     }
 
-    fprintf(log_file, "[%s] %s\n", timestamp, message);
+    fprintf(log_file, "[%s] ", timestamp);
+
+    va_list args;
+    va_start(args, format);
+    vfprintf(log_file, format, args);
+    va_end(args);
+
+    fprintf(log_file, "\n");
+
     free(timestamp);
     fclose(log_file);
 }
