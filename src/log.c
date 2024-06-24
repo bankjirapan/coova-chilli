@@ -42,8 +42,8 @@ void write_dhcp_log(const char *message,...) {
     fprintf(log_file, "[%s] ", timestamp);
 
     va_list args;
-    va_start(args, format);
-    vfprintf(log_file, format, args);
+    va_start(args, message);
+    vfprintf(log_file, message, args);
     va_end(args);
 
     fprintf(log_file, "\n");
