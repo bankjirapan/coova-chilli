@@ -19,6 +19,7 @@
  */
 
 #include "chilli.h"
+#include "log.h"
 #include "bstrlib.h"
 #ifdef ENABLE_MODULES
 #include "chilli_module.h"
@@ -4977,10 +4978,9 @@ int cb_dhcp_request(struct dhcp_conn_t *conn, struct in_addr *addr,
   char domacauth = (char) _options.macauth;
   char allocate = 1;
 
-#if(_debug_)
   syslog(LOG_DEBUG, "%s(%d): DHCP request for IP address %s", __FUNCTION__, __LINE__,
          addr ? inet_ntoa(*addr) : "n/a");
-#endif
+  LOG_DHCP_REQUEST(conn, addr, dhcp_pkt, dhcp_len);
 
   if (!appconn) {
     syslog(LOG_ERR, "Peer protocol not defined");
