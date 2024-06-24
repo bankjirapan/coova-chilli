@@ -6,6 +6,6 @@
 #include <string.h>
 #include <time.h>
 
-void write_log(const char *message);
+void write_dhcp_log(const char *message);
 
 #endif // LOG_H

@@ -1,22 +1,35 @@
 #include "log.h"
+#include <sys/stat.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
 
-#define LOG_FILE_PATH "/var/log/chilli/dhcp.log"
+#define DHCP_LOG_FILE_PATH "/var/log/chilli/"
 
-// Helper function to get the current timestamp as a string
 char* get_timestamp() {
     time_t rawtime;
     struct tm * timeinfo;
-    char *buffer = (char*)malloc(20 * sizeof(char));
-
+    char *buffer = (char*)malloc(20 * sizeof(char)); // ปรับขนาดตามความต้องการ
+    if (buffer == NULL) {
+        perror("Error allocating memory for timestamp");
+        return NULL;
+    }
     time(&rawtime);
     timeinfo = localtime(&rawtime);
-
     strftime(buffer, 20, "%Y-%m-%d %H:%M:%S", timeinfo);
     return buffer;
 }
 
-void write_log(const char *message) {
-    FILE *log_file = fopen(LOG_FILE_PATH, "a");
+void write_dhcp_log(const char *message) {
+
+    struct stat st = {0};
+    FILE *log_file;
+
+    if (stat(DHCP_LOG_FILE_PATH, &st) == -1) {
+        mkdir(DHCP_LOG_FILE_PATH, 0700);
+    }
+
+    log_file = fopen(DHCP_LOG_FILE_PATH "chilli.log", "a");
     if (log_file == NULL) {
         perror("Error opening log file");
         return;
@@ -24,7 +37,6 @@ void write_log(const char *message) {
 
     char *timestamp = get_timestamp();
     if (timestamp == NULL) {
-        perror("Error getting timestamp");
         fclose(log_file);
         return;
     }
