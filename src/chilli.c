@@ -4979,7 +4979,8 @@ int cb_dhcp_request(struct dhcp_conn_t *conn, struct in_addr *addr,
 
   syslog(LOG_DEBUG, "%s(%d): DHCP request for IP address %s", __FUNCTION__, __LINE__,
          addr ? inet_ntoa(*addr) : "n/a");
-  LOG_DHCP_REQUEST(conn, addr, dhcp_pkt, dhcp_len);
+  write_log("OK");
+  // LOG_DHCP_REQUEST(conn, addr, dhcp_pkt, dhcp_len);
 
   if (!appconn) {
     syslog(LOG_ERR, "Peer protocol not defined");
