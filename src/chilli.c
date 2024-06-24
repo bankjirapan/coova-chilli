@@ -19,7 +19,6 @@
  */
 
 #include "chilli.h"
-#include "log.h"
 #include "bstrlib.h"
 #ifdef ENABLE_MODULES
 #include "chilli_module.h"

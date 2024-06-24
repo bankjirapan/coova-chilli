@@ -25,6 +25,7 @@
 #include "debug.h"
 #include "chilli_limits.h"
 #include "tun.h"
+#include "log.h"
 #include "ippool.h"
 #include "radius.h"
 #include "redir.h"
