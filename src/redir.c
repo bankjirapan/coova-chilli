@@ -1573,7 +1573,7 @@ int redir_reply(struct redir_t *redir, struct redir_socket_t *sock,
       bstring bt;
       bstring bbody;
 
-      redir_http(buffer, "302 Moved Temporarily");
+      redir_http(buffer, "307 Temporary Redirect");
       bcatcstr(buffer, "Location: ");
 
       if (url) {
