@@ -53,6 +53,7 @@ typedef struct {
 #include <wolfssl/ssl.h>
 #include <wolfssl/openssl/bio.h>
 #include <wolfssl/openssl/crypto.h>
+#include <wolfssl/openssl/engine.h>
 #include <wolfssl/openssl/x509.h>
 #include <wolfssl/openssl/ssl.h>
 #include <wolfssl/openssl/pem.h>
