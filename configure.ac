@@ -403,15 +403,16 @@ AS_IF([test x"$with_wolfssl" != xno],
                          [Define if you have wolfssl])
               ],
               [AC_MSG_FAILURE(
-                 [--with-wolfssl was given, but test for wolfssl failed])],
+                 [--with-wolfssl was given, but test for wolfssl failed. Ensure libwolfssl is installed and in the library path. Use --with-wolfssl=DIR if necessary.])],
               [-lwolfssl])])
 
 AS_IF([test x"$with_wolfssl" != xno],
-  [AC_CHECK_HEADERS([wolfssl/ssl.h ssh.h])])
+  [AC_CHECK_HEADERS([wolfssl/options.h wolfssl/ssl.h])])
 
 AM_CONDITIONAL(WITH_WOLFSSL, [test x"$with_wolfssl" != xno])
 
 AM_CONDITIONAL(WITH_SSL, [test x"$with_openssl" != xno || test x"$with_matrixssl" != xno || test x"$with_wolfssl" != xno])
+
 
 AC_ARG_WITH([matrixssl-cli],
  [AS_HELP_STRING([--with-matrixssl-cli], [enable matrixssl client use])],[],[with_matrixssl_cli=no])
