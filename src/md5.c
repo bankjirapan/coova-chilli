@@ -18,7 +18,37 @@
 #include <string.h>		/* for memcpy() */
 #include "md5.h"
 
-#if !defined(HAVE_OPENSSL) && !defined(HAVE_WOLFSSL)
+#if defined(HAVE_OPENSSL)
+
+void MD5Init(struct MD5Context *ctx)
+{
+  ctx->ctx = EVP_MD_CTX_new();
+  if (ctx->ctx) {
+    EVP_DigestInit_ex(ctx->ctx, EVP_md5(), NULL);
+  }
+}
+
+void MD5Update(struct MD5Context *ctx, unsigned char const *buf, size_t len)
+{
+  if (ctx->ctx) {
+    EVP_DigestUpdate(ctx->ctx, buf, len);
+  }
+}
+
+void MD5Final(unsigned char digest[16], struct MD5Context *ctx)
+{
+  unsigned int out_len = 0;
+
+  memset(digest, 0, 16);
+
+  if (ctx->ctx) {
+    EVP_DigestFinal_ex(ctx->ctx, digest, &out_len);
+    EVP_MD_CTX_free(ctx->ctx);
+    ctx->ctx = NULL;
+  }
+}
+
+#elif !defined(HAVE_WOLFSSL)
 
 void byteReverse(unsigned char *buf, size_t longs);
 

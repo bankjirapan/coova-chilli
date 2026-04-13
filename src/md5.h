@@ -22,11 +22,17 @@
 #include "system.h"
 
 #if HAVE_OPENSSL
-#include <openssl/md5.h>
+#include <openssl/evp.h>
 
-#define MD5Init MD5_Init
-#define MD5Update MD5_Update
-#define MD5Final MD5_Final
+struct MD5Context {
+  EVP_MD_CTX *ctx;
+};
+
+void MD5Init(struct MD5Context *context);
+void MD5Update(struct MD5Context *context, unsigned char const *buf, size_t len);
+void MD5Final(unsigned char digest[16], struct MD5Context *context);
+
+typedef struct MD5Context MD5_CTX;
 
 #elif HAVE_WOLFSSL
 #include <wolfssl/openssl/md5.h>
