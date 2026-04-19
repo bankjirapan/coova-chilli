@@ -643,8 +643,10 @@ leaky_bucket(struct app_conn_t *conn,
   int result = 0;
   uint64_t upbytes=0, dnbytes=0;
   long double timediff;
+  struct timespec last_bw_time;
 
-  timediff = mainclock_diffd(&conn->s_state.last_bw_time);
+  last_bw_time = conn->s_state.last_bw_time;
+  timediff = mainclock_diffd(&last_bw_time);
 
   if (conn->s_params.bandwidthmaxup) {
     upbytes = (uint64_t) ((timediff * conn->s_params.bandwidthmaxup) / 8);
@@ -6070,6 +6072,7 @@ int static uam_msg(struct redir_msg_t *msg) {
   struct ippoolm_t *ipm;
   struct app_conn_t *appconn = NULL;
   struct dhcp_conn_t* dhcpconn;
+  struct in_addr reqip;
 
 #if defined(HAVE_NETFILTER_QUEUE) || defined(HAVE_NETFILTER_COOVA)
   if (_options.uamlisten.s_addr != _options.dhcplisten.s_addr) {
@@ -6078,9 +6081,10 @@ int static uam_msg(struct redir_msg_t *msg) {
   }
 #endif
 
-  if (ippool_getip(ippool, &ipm, &msg->mdata.address.sin_addr)) {
+  reqip = msg->mdata.address.sin_addr;
+  if (ippool_getip(ippool, &ipm, &reqip)) {
     if (_options.debug)
-      syslog(LOG_DEBUG, "%s(%d): UAM login with unknown IP address: %s", __FUNCTION__, __LINE__, inet_ntoa(msg->mdata.address.sin_addr));
+      syslog(LOG_DEBUG, "%s(%d): UAM login with unknown IP address: %s", __FUNCTION__, __LINE__, inet_ntoa(reqip));
     return 0;
   }
 
@@ -6200,9 +6204,11 @@ static struct app_conn_t * find_app_conn(struct cmdsock_request *req,
                                          int *has_criteria) {
   struct app_conn_t *appconn = 0;
   struct dhcp_conn_t *dhcpconn = 0;
+  struct in_addr reqip;
 
   if (req->ip.s_addr) {
-    appconn = dhcp_get_appconn_ip(0, &req->ip);
+    reqip = req->ip;
+    appconn = dhcp_get_appconn_ip(0, &reqip);
     if (has_criteria)
       *has_criteria = 1;
   } else {
@@ -6268,8 +6274,10 @@ int chilli_cmd(struct cmdsock_request *req, bstring s, int sock) {
           syslog(LOG_DEBUG, "%s(%d): looking to inspect ip=%s/mac="MAC_FMT, __FUNCTION__, __LINE__,
                  inet_ntoa(req->ip), MAC_ARG(req->mac));
 
-        if (req->ip.s_addr)
-          appconn = dhcp_get_appconn_ip(0, &req->ip);
+        if (req->ip.s_addr) {
+          struct in_addr reqip = req->ip;
+          appconn = dhcp_get_appconn_ip(0, &reqip);
+        }
         else
 #ifdef ENABLE_LAYER3
           if (!_options.layer3)
@@ -7124,10 +7132,14 @@ int static redir_msg(struct redir_t *this) {
     if (msgresult == sizeof(msg)) {
       if (msg.mtype == REDIR_MSG_STATUS_TYPE) {
 	struct redir_conn_t conn;
+  struct sockaddr_in address;
+  struct sockaddr_in baddress;
 	memset(&conn, 0, sizeof(conn));
+  address = msg.mdata.address;
+  baddress = msg.mdata.baddress;
 	if (cb_redir_getstate(redir,
-			      &msg.mdata.address,
-			      &msg.mdata.baddress,
+            &address,
+            &baddress,
 			      &conn) != -1) {
 	  if (safe_write(socket, &conn, sizeof(conn)) < 0) {
 	    syslog(LOG_ERR, "%s: redir_msg writing", strerror(errno));
