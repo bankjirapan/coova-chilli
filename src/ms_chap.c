@@ -76,7 +76,22 @@ MakeKey(u_char *key, u_char *des_key)
   des_key[6] = Get7Bits(key, 42);
   des_key[7] = Get7Bits(key, 49);
 
-  DES_set_odd_parity((DES_cblock *)des_key);
+  {
+    int i;
+
+    for (i = 0; i < 8; i++) {
+      u_char byte = des_key[i] & 0xFE;
+      u_char value = byte >> 1;
+      u_char parity = 1;
+
+      while (value) {
+        parity ^= value & 1;
+        value >>= 1;
+      }
+
+      des_key[i] = byte | parity;
+    }
+  }
 }
 
 static void
