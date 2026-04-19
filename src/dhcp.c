@@ -5662,7 +5662,9 @@ int dhcp_relay_decaps(struct dhcp_t *this, int idx) {
   if (message_type->v[0] != DHCPNAK &&
       (conn->authstate == DHCP_AUTH_NONE ||
        conn->authstate == DHCP_AUTH_DNAT)) {
-    this->cb_request(conn, (struct in_addr *)&packet.yiaddr, 0, 0);
+    struct in_addr yiaddr;
+    yiaddr.s_addr = packet.yiaddr;
+    this->cb_request(conn, &yiaddr, 0, 0);
   }
 
   packet.giaddr = 0;
