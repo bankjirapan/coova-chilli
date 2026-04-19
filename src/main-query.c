@@ -93,6 +93,7 @@ struct cmd_arguments {
 };
 
 static struct cmdsock_request request;
+static uint16_t request_session_flags;
 
 static struct cmd_arguments args[] = {
   { "ip",
@@ -165,21 +166,21 @@ static struct cmd_arguments args[] = {
     sizeof(request.d.sess.params.url),
     &request.d.sess.params.url,
     "Set splash page",
-    &request.d.sess.params.flags, REQUIRE_UAM_SPLASH },
+    &request_session_flags, REQUIRE_UAM_SPLASH },
 #ifdef ENABLE_REDIRINJECT
   { "inject",
     CMDSOCK_FIELD_STRING,
     sizeof(request.d.sess.params.url),
     &request.d.sess.params.url,
     "Inject url flag",
-    &request.d.sess.params.flags, UAM_INJECT_URL | REQUIRE_UAM_AUTH },
+    &request_session_flags, UAM_INJECT_URL | REQUIRE_UAM_AUTH },
 #endif
   { "url",
     CMDSOCK_FIELD_STRING,
     sizeof(request.d.sess.params.url),
     &request.d.sess.params.url,
     "Set redirect url",
-    &request.d.sess.params.flags, REQUIRE_REDIRECT },
+    &request_session_flags, REQUIRE_REDIRECT },
 #ifdef ENABLE_MULTIROUTE
   { "routeidx",
     CMDSOCK_FIELD_INTEGER,
@@ -197,7 +198,7 @@ static struct cmd_arguments args[] = {
   { "noacct",
     CMDSOCK_FIELD_NONE, 0, 0,
     "No accounting flag",
-    &request.d.sess.params.flags, NO_ACCOUNTING },
+    &request_session_flags, NO_ACCOUNTING },
   { "data",
     CMDSOCK_FIELD_STRING,
     sizeof(request.d.data),
@@ -449,6 +450,7 @@ int main(int argc, char **argv) {
   }
 
   memset(&request,0,sizeof(request));
+  request_session_flags = 0;
 
   while (argidx < argc && *argv[argidx] == '-') {
     if (!strcmp(argv[argidx], "-s")) {
@@ -600,6 +602,8 @@ int main(int argc, char **argv) {
     struct sockaddr_in remote_port;
     struct in_addr addr;
 
+    request.d.sess.params.flags = request_session_flags;
+
     if ((s = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1) {
       perror("socket");
       exit(1);
@@ -654,6 +658,8 @@ int main(int argc, char **argv) {
       perror("socket");
       exit(1);
     }
+
+    request.d.sess.params.flags = request_session_flags;
 
     remote.sun_family = AF_UNIX;
     strlcpy(remote.sun_path, cmdsock, sizeof(remote.sun_path));
